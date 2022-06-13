@@ -4,6 +4,8 @@ import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import { WorkshopPipelineStage } from './pipeline-stage';
 import { CodeBuildStep, CodePipeline, CodePipelineSource } from "aws-cdk-lib/pipelines";
 
+import { Stack,  ScopedAws, StackProps } from '@aws-cdk/core';
+
 
 
 
@@ -16,6 +18,12 @@ const girrepoAP = new codecommit.Repository(this, 'bousai-ap-repo', {
 //Artifact
 const sourceOutput = new CodePipeline.Artifact();
 const buildOutput = new CodePipeline.Artifact();
+
+const {
+    accountId,
+    stackName,
+    region,
+  } = new ScopedAws(this)
 
    
    
@@ -32,7 +40,7 @@ const codeBuildProject = new CodeBuildStep.PipelineProject(this, `project`, {
         environmentVariables: {
             AWS_DEFAULT_REGION: { 
                 type: CodeBuildStep.BuildEnvironmentVariableType.PLAINTEXT,
-                value: '' },
+                value: '${region}' },
 
             REPOSITORY_NAME: { 
                 type: CodeBuildStep.BuildEnvironmentVariableType.PLAINTEXT,
@@ -40,7 +48,7 @@ const codeBuildProject = new CodeBuildStep.PipelineProject(this, `project`, {
 
             AWS_ACCOUNT_ID: { 
                 type: CodeBuildStep.BuildEnvironmentVariableType.PLAINTEXT,
-                value: '' },
+                value: '${accountId}' },
                   },    
         },
 
@@ -124,102 +132,3 @@ const codeBuildProject = new CodeBuildStep.PipelineProject(this, `project`, {
         ]
         }); 
               
-        
-        // buildSpec: BuildSpec.fromObject(PipelineConfig.buildStage.buildSpec),
-        // cache: Cache.local(LocalCacheMode.DOCKER_LAYER, LocalCacheMode.CUSTOM),  
-
-
-//   const codeBuildProject =  new CodeBuildStep.PipelineProject(this, 'Project', {
-//         buildSpec: CodeBuildStep.BuildSpec.fromObject({
-//           version: '0.2',
-//           env: {
-//             'exported-variables': [
-//               'MY_VAR',
-//             ],
-//           },
-//           phases: {
-//             build: {
-//               commands: 'export MY_VAR="some value"',
-//             },
-//           },
-//         }),
-//       }),    outputs: [buildOutput]  
-
-//   project: new CodeBuildStep.PipelineProject(this, 'Project', {
-//         buildSpec: CodeBuildStep.BuildSpec.fromObject({
-//           version: '0.2',
-//           env: {
-//             'exported-variables': [
-//               'MY_VAR',
-//             ],
-//           },
-//           phases: {
-//             build: {
-//               commands: 'export MY_VAR="some value"',
-//             },
-//           },
-//         }),
-//       }),    outputs: [buildOutput] project: new CodeBuildStep.PipelineProject(this, 'Project', {
-//     buildSpec: CodeBuildStep.BuildSpec.fromObject({
-//       version: '0.2',
-//       env: {
-//         'exported-variables': [
-//           'MY_VAR',
-//         ],
-//       },
-//       phases: {
-//         build: {
-//           commands: 'export MY_VAR="some value"',
-//         },
-//       },
-//     }),
-//   }),    outputs: [buildOutput] 
-
-
-
-
-// // The basic pipeline declaration. This sets the initial structure
-//     // of our pipeline
-
-// const CICDpipeline = new CodePipeline(this, 'Pipeline', {
-//     pipelineName: 'WorkshopPipeline',
-//     //Stage
-//     synth: new CodeBuildStep('SynthStep', {
-//       input: CodePipelineSource.codeCommit(girrepoAP, 'master'),
-
-
-//       installCommands: [
-//         'npm install -g aws-cdk'
-//       ],
-//       commands: [
-//         'npm ci',
-//         'npm run build',
-//         'npx cdk synth'
-//       ]
-//     }
-//     )
-//   });
-
-
-
-//   // Pipeline 
-
-//       /**
-//      * Pipeline を定義し、あらかじめ作っておいたアクションを任意のステージに設置する
-//     **/
-//        const pipeline = new Pipeline(stack, 'GreetingApplicationDeploy-pipeline', {
-//         pipelineName: 'GreetingApplicationDeploy-pipeline',
-//     });
-
-//     pipeline.addStage({
-//         stageName: 'GitHubSourceAction-stage',
-//         actions: [sourceAction],
-//     });
-
-//     pipeline.addStage({
-//         stageName: 'GreetingApplicationDeploy-stage',
-//         actions: [approvalAction, applicationDeployAction],
-//     });
-
-//     return stack;
-// }
